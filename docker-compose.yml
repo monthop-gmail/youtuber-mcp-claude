@@ -1,0 +1,26 @@
+services:
+  youtuber-mcp:
+    build: .
+    container_name: youtuber-mcp-claude
+    restart: unless-stopped
+    ports:
+      - "3030:3000"
+    volumes:
+      - ./data:/app/data
+    environment:
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - GOOGLE_REFRESH_TOKEN=${GOOGLE_REFRESH_TOKEN}
+      - YOUTUBE_CHANNEL_ID=${YOUTUBE_CHANNEL_ID:-}
+      - CACHE_TTL_SECONDS=${CACHE_TTL_SECONDS:-300}
+      - YOUTUBE_DAILY_QUOTA=${YOUTUBE_DAILY_QUOTA:-10000}
+      - CACHE_DB_PATH=/app/data/cache.db
+      - CALENDAR_DB_PATH=/app/data/calendar.db
+      - SSE_HOST=0.0.0.0
+      - SSE_PORT=3000
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
